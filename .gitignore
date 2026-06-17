@@ -1,0 +1,107 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos compilados
+*.so
+*.pyd
+*.dll
+
+# Distribución / empaquetado
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Entornos virtuales
+# =========================
+venv/
+.venv/
+env/
+ENV/
+
+# =========================
+# Variables de entorno
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDEs
+# =========================
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+*.iml
+
+# =========================
+# Testing y cobertura
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Sistema operativo
+# =========================
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+
+# =========================
+# Ollama / modelos
+# =========================
+models/
+*.gguf
+
+# =========================
+# Datos temporales
+# =========================
+tmp/
+temp/
+cache/
+
+# =========================
+# Archivos de ejecución
+# =========================
+*.pid
+
+# =========================
+# Bases de datos locales
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Calendario persistente
+# =========================
+data/calendar.json
+
+# =========================
+# Archivos generados
+# =========================
+output/
+reports/
