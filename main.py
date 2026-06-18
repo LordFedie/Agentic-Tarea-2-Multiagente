@@ -1,18 +1,16 @@
-from agents.calculator import CalculatorAgent
+from agents.coordinator import CoordinatorAgent
 
 
 def main():
 
-    print("\n===== INICIO DEL SISTEMA =====")
+    coordinator = CoordinatorAgent()
 
-    calculator = CalculatorAgent()
-
-    result = calculator.run(
-        "¿Cuánto es la raíz cuadrada de 256?"
+    response = coordinator.run(
+        input("Consulta: ")
     )
 
     print("\n===== RESPUESTA FINAL =====")
-    print(result)
+    print(response)
 
 
 if __name__ == "__main__":

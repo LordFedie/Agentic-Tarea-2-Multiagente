@@ -50,38 +50,67 @@ def get_events_by_date(date):
     ]
 
 
-def update_event(title, date, new_time):
+def update_event(title, new_time, date=None):
+
     data = load_calendar()
 
     for event in data["events"]:
-        if (
-            event["title"].lower() == title.lower()
-            and event["date"] == date
-        ):
+
+        title_match = (
+            title.lower()
+            in event["title"].lower()
+        )
+
+        date_match = (
+            True
+            if date is None
+            else event["date"] == date
+        )
+
+        if title_match and date_match:
+
             event["time"] = new_time
 
             save_calendar(data)
 
-            return event
+            print(
+                f"[CALENDAR TOOL] Evento actualizado: "
+                f"{event}"
+            )
 
-    print(f"[CALENDAR TOOL] Evento actualizado: {event}")
+            return event
 
     return None
 
-    def delete_event(title, date):
+
+def delete_event(title, date=None):
+
     data = load_calendar()
 
     for i, event in enumerate(data["events"]):
-        if (
-            event["title"].lower() == title.lower()
-            and event["date"] == date
-        ):
+
+        title_match = (
+            title.lower()
+            in event["title"].lower()
+        )
+
+        date_match = (
+            True
+            if date is None
+            else event["date"] == date
+        )
+
+        if title_match and date_match:
+
             removed = data["events"].pop(i)
 
             save_calendar(data)
 
-            return removed
+            print(
+                f"[CALENDAR TOOL] Evento eliminado: "
+                f"{removed}"
+            )
 
-    print(f"[CALENDAR TOOL] Evento eliminado: {removed}")
+            return removed
 
     return None

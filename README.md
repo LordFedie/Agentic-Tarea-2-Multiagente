@@ -8,7 +8,7 @@
 
 # Dependencias
 - pip install ollama
-- pip install duckduckgo-search
+- pip install ddgs
 - pip install python-dotenv
 - pip install pydantic
 - pip install rich

@@ -1,31 +1,68 @@
+from agents.prompts.calculator_prompt import (
+    CALCULATOR_PROMPT
+)
+
 from utils.ollama_client import ask_llm
 
+from utils.calculator_parser import (
+    parse_calculator_response
+)
 
-SYSTEM_PROMPT = """
-Eres el Agente Calculador.
-
-Tu trabajo es:
-- Resolver operaciones matemáticas.
-- Explicar brevemente el resultado.
-- Nunca responder preguntas de calendario.
-- Nunca responder preguntas conceptuales.
-"""
+from tools.math_tools import (
+    sumar,
+    restar,
+    multiplicar,
+    dividir,
+    potencia,
+    raiz
+)
 
 
 class CalculatorAgent:
 
+    def __init__(self):
+
+        self.tools = {
+            "sumar": sumar,
+            "restar": restar,
+            "multiplicar": multiplicar,
+            "dividir": dividir,
+            "potencia": potencia,
+            "raiz": raiz
+        }
+
     def run(self, task: str):
 
-        print("\n======================")
-        print("[CALCULADOR]")
-        print("======================")
-        print(f"Tarea recibida: {task}")
+        print("\n[CALCULADOR]")
+        print(f"Tarea: {task}")
 
-        response = ask_llm(
-            SYSTEM_PROMPT,
+        llm_response = ask_llm(
+            CALCULATOR_PROMPT,
             task
         )
 
-        print("[CALCULADOR] Tarea completada")
+        print(
+            f"[CALCULADOR] Decisión: "
+            f"{llm_response}"
+        )
 
-        return response
+        tool_name, args = parse_calculator_response(
+            llm_response
+        )
+
+        if tool_name not in self.tools:
+
+            return (
+                "No pude determinar "
+                "la herramienta adecuada."
+            )
+
+        result = self.tools[
+            tool_name
+        ](*args)
+
+        return (
+            f"Herramienta usada: "
+            f"{tool_name}\n"
+            f"Resultado: {result}"
+        )
