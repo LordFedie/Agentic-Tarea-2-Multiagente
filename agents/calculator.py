@@ -1,21 +1,7 @@
-from agents.prompts.calculator_prompt import (
-    CALCULATOR_PROMPT
-)
-
+from agents.prompts.calculator_prompt import (CALCULATOR_PROMPT)
 from utils.ollama_client import ask_llm
-
-from utils.calculator_parser import (
-    parse_calculator_response
-)
-
-from tools.math_tools import (
-    sumar,
-    restar,
-    multiplicar,
-    dividir,
-    potencia,
-    raiz
-)
+from utils.calculator_parser import (parse_calculator_response)
+from tools.math_tools import (sumar,restar,multiplicar,dividir,potencia,raiz)
 
 
 class CalculatorAgent:

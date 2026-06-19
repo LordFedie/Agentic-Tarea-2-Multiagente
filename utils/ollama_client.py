@@ -9,7 +9,7 @@ def ask_llm(system_prompt: str, user_message: str):
 
     response = chat(
         model=OLLAMA_MODEL,
-        messages=[
+        messages=[   # ← aquí sí hay coma arriba
             {
                 "role": "system",
                 "content": system_prompt
@@ -18,7 +18,10 @@ def ask_llm(system_prompt: str, user_message: str):
                 "role": "user",
                 "content": user_message
             }
-        ]
+        ],
+        options={    # ← opcional pero recomendado
+            "num_gpu": 0
+        }
     )
 
     print("[OLLAMA] Respuesta recibida")

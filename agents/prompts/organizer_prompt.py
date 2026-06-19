@@ -78,4 +78,28 @@ Respuesta:
 TOOL: delete_event
 TITLE: reunión de proyecto
 DATE: 2026-08-20
+
+========================
+BORRAR TODOS LOS EVENTOS
+========================
+
+Si el usuario quiere eliminar todos los eventos
+del calendario responde exactamente:
+
+TOOL: delete_all_events
+
+Ejemplos:
+
+Usuario:
+elimina todos mis eventos
+
+Respuesta:
+TOOL: delete_all_events
+
+Usuario:
+vacía mi calendario
+
+Respuesta:
+TOOL: delete_all_events
 """
+

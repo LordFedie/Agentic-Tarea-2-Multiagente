@@ -114,3 +114,15 @@ def delete_event(title, date=None):
             return removed
 
     return None
+
+def delete_all_events():
+
+    data = {"events": []}
+
+    save_calendar(data)
+
+    print(
+        "[CALENDAR TOOL] Todos los eventos eliminados"
+    )
+
+    return True

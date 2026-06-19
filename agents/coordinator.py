@@ -1,18 +1,14 @@
 from agents.calculator import CalculatorAgent
 from agents.organizer import OrganizerAgent
 from agents.expert import ExpertAgent
-from agents.prompts.coordinator_prompt import (COORDINATOR_PROMPT)
+from agents.critic import CriticAgent
+
+from agents.prompts.coordinator_prompt import (
+    COORDINATOR_PROMPT
+)
+
 from utils.ollama_client import ask_llm
 
-def normalize(text):
-
-    return ''.join(
-        c for c in unicodedata.normalize(
-            'NFD',
-                text
-        )
-        if unicodedata.category(c) != 'Mn'
-    ).lower()
 
 class CoordinatorAgent:
 
@@ -21,6 +17,7 @@ class CoordinatorAgent:
         self.calculator = CalculatorAgent()
         self.organizer = OrganizerAgent()
         self.expert = ExpertAgent()
+        self.critic = CriticAgent()
 
     def run(self, user_message: str):
 
@@ -39,18 +36,63 @@ class CoordinatorAgent:
 
         decision = decision.lower()
 
+        # Calculator
         if "calculator" in decision:
 
-            return self.calculator.run(
+            response = self.calculator.run(
                 user_message
             )
 
+            review = self.critic.run(
+                user_message,
+                response
+            )
+
+            print(
+                f"[CRITIC] Veredicto: {review}"
+            )
+
+            return response
+
+        # Organizer
         if "organizer" in decision:
 
-            return self.organizer.run(
+            response = self.organizer.run(
                 user_message
             )
 
-        return self.expert.run(
+            review = self.critic.run(
+                user_message,
+                response
+            )
+
+            print(
+                f"[CRITIC] Veredicto: {review}"
+            )
+
+            return response
+
+        # Expert
+        response = self.expert.run(
             user_message
         )
+
+        review = self.critic.run(
+            user_message,
+            response
+        )
+
+        print(
+            f"[CRITIC] Veredicto: {review}"
+        )
+
+        if "invalid" in review.lower():
+
+            print("[COORDINADOR] Respuesta rechazada por el CRITIC")
+
+            return (
+                "Hubo un problema al procesar la solicitud. "
+                "Intenta reformularla."
+            )
+
+        return response
