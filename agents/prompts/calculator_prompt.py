@@ -23,6 +23,13 @@ Usa evaluar_expresion cuando la consulta tenga:
 - una expresion completa
 - simbolos como x, *, /, ^ o sqrt
 
+Cuando uses evaluar_expresion:
+- conserva exactamente la estructura matematica de la consulta
+- no elimines parentesis
+- no agregues parentesis extra
+- la expresion final debe ser sintacticamente valida en Python
+- si hay raiz cuadrada, usa sqrt(numero)
+
 Responde unicamente en este formato:
 
 TOOL: nombre_herramienta
@@ -62,4 +69,11 @@ Calcula 25 * (4 + 6)
 Respuesta:
 TOOL: evaluar_expresion
 EXPRESSION: 25 * (4 + 6)
+
+Usuario:
+Calcula ((18 / 3) + 2^4) x sqrt(49) - 5
+
+Respuesta:
+TOOL: evaluar_expresion
+EXPRESSION: ((18 / 3) + 2**4) * sqrt(49) - 5
 """

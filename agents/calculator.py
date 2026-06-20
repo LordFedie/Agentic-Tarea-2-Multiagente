@@ -52,9 +52,15 @@ class CalculatorAgent:
             if not expression:
                 return "Falta la expresion a evaluar."
 
-            result = self.tools[tool_name](
-                expression
-            )
+            try:
+                result = self.tools[tool_name](
+                    expression
+                )
+            except Exception as error:
+                return (
+                    "No se pudo evaluar la expresion generada. "
+                    f"Error: {error}"
+                )
 
             return (
                 f"Herramienta usada: {tool_name}\n"
@@ -62,9 +68,15 @@ class CalculatorAgent:
                 f"Resultado: {result}"
             )
 
-        result = self.tools[
-            tool_name
-        ](*action["ARGS"])
+        try:
+            result = self.tools[
+                tool_name
+            ](*action["ARGS"])
+        except Exception as error:
+            return (
+                "No se pudo ejecutar la herramienta matematica. "
+                f"Error: {error}"
+            )
 
         return (
             f"Herramienta usada: "

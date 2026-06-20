@@ -70,10 +70,14 @@ def evaluar_expresion(expression: str) -> float:
     )
 
     normalized_expression = re.sub(
-        r"(?<=\d)\s*x\s*(?=\d|\()",
+        r"(?<=[\d\)])\s*x\s*(?=\d|\(|sqrt)",
         " * ",
         normalized_expression,
         flags=re.IGNORECASE
+    )
+
+    normalized_expression = _balance_parentheses(
+        normalized_expression
     )
 
     parsed_tree = ast.parse(
@@ -129,3 +133,29 @@ def _evaluate_node(node):
         return raiz(_evaluate_node(node.args[0]))
 
     raise ValueError("Expresion no permitida")
+
+
+def _balance_parentheses(expression: str) -> str:
+    balanced_chars = []
+    open_count = 0
+
+    for char in expression:
+        if char == "(":
+            open_count += 1
+            balanced_chars.append(char)
+            continue
+
+        if char == ")":
+            if open_count == 0:
+                continue
+
+            open_count -= 1
+            balanced_chars.append(char)
+            continue
+
+        balanced_chars.append(char)
+
+    if open_count > 0:
+        balanced_chars.extend(")" * open_count)
+
+    return "".join(balanced_chars)
