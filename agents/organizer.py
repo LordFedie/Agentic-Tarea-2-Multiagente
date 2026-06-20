@@ -1,6 +1,7 @@
 from agents.prompts.organizer_prompt import (ORGANIZER_PROMPT)
 from utils.ollama_client import ask_llm
 from utils.organizer_parser import (parse_organizer_response)
+from utils.date_utils import normalize_dates_in_text
 from tools.calendar_tools import (add_event,update_event,delete_event,get_events_by_date,delete_all_events)
 
 
@@ -11,13 +12,23 @@ class OrganizerAgent:
         print("\n[ORGANIZER]")
         print(f"Tarea: {task}")
 
-        llm_response = ask_llm(
-            ORGANIZER_PROMPT,
+        normalized_task = normalize_dates_in_text(
             task
         )
 
+        if normalized_task != task:
+            print(
+                "[ORGANIZER] Tarea normalizada: "
+                f"{normalized_task}"
+            )
+
+        llm_response = ask_llm(
+            ORGANIZER_PROMPT,
+            normalized_task
+        )
+
         print(
-            f"[ORGANIZER] Decisión:\n"
+            f"[ORGANIZER] Decision:\n"
             f"{llm_response}"
         )
 
@@ -76,18 +87,21 @@ class OrganizerAgent:
 
         if tool == "get_events_by_date":
 
-            result = get_events_by_date(
-                action["DATE"]
-            )
+            date = action.get("DATE")
+
+            if not date:
+                return "Falta la fecha para buscar eventos."
+
+            result = get_events_by_date(date)
 
             return (
                 f"Eventos encontrados:\n"
                 f"{result}"
             )
 
-        if action["TOOL"] == "delete_all_events":
+        if tool == "delete_all_events":
 
-            result = delete_all_events()
+            delete_all_events()
 
             return (
                 "Todos los eventos fueron "
@@ -96,5 +110,5 @@ class OrganizerAgent:
 
         return (
             "No pude determinar "
-            "la acción a realizar."
+            "la accion a realizar."
         )

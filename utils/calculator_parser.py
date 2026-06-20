@@ -1,14 +1,15 @@
 def parse_calculator_response(response):
 
-    lines = response.splitlines()
+    action = {
+        "TOOL": None,
+        "ARGS": [],
+        "EXPRESSION": None
+    }
 
-    tool = None
-    args = []
-
-    for line in lines:
+    for line in response.splitlines():
 
         if line.startswith("TOOL:"):
-            tool = line.replace(
+            action["TOOL"] = line.replace(
                 "TOOL:",
                 ""
             ).strip()
@@ -20,9 +21,16 @@ def parse_calculator_response(response):
                 ""
             ).strip()
 
-            args = [
+            action["ARGS"] = [
                 float(x.strip())
                 for x in raw_args.split(",")
+                if x.strip()
             ]
 
-    return tool, args
+        if line.startswith("EXPRESSION:"):
+            action["EXPRESSION"] = line.replace(
+                "EXPRESSION:",
+                ""
+            ).strip()
+
+    return action

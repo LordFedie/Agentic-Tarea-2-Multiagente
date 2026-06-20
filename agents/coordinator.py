@@ -8,6 +8,7 @@ from agents.prompts.coordinator_prompt import (
 )
 
 from utils.ollama_client import ask_llm
+from utils.query_decomposer import split_compound_request
 
 
 class CoordinatorAgent:
@@ -24,61 +25,73 @@ class CoordinatorAgent:
         print("\n[COORDINADOR]")
         print(f"Consulta recibida: {user_message}")
 
-        decision = ask_llm(
-            COORDINATOR_PROMPT,
+        tasks = split_compound_request(
             user_message
         )
 
-        print("[COORDINADOR] Respuesta cruda:")
-        print(repr(decision))
+        print(f"[COORDINADOR] Subtareas detectadas: {len(tasks)}")
 
-        print(f"[COORDINADOR] Decisión: {decision}")
+        final_responses = []
 
-        decision = decision.lower()
+        for index, task in enumerate(tasks, start=1):
 
-        # Calculator
-        if "calculator" in decision:
+            print(f"\n[COORDINADOR] Subtarea {index}: {task}")
 
-            response = self.calculator.run(
-                user_message
+            decision = ask_llm(
+                COORDINATOR_PROMPT,
+                task
             )
 
-            review = self.critic.run(
-                user_message,
-                response
+            print("[COORDINADOR] Respuesta cruda:")
+            print(repr(decision))
+
+            normalized_decision = decision.lower()
+
+            print(f"[COORDINADOR] Decision: {decision}")
+
+            response, review = self._execute_with_retry(
+                normalized_decision,
+                task
             )
 
-            print(
-                f"[CRITIC] Veredicto: {review}"
+            if "invalid" in review.lower():
+
+                print(
+                    "[COORDINADOR] La subtarea fue rechazada "
+                    "tras dos intentos"
+                )
+
+                return (
+                    "Hubo un problema al procesar la solicitud. "
+                    f"Subtarea rechazada: {task}"
+                )
+
+            final_responses.append(
+                f"Subtarea {index}: {response}"
             )
 
-            return response
-
-        # Organizer
-        if "organizer" in decision:
-
-            response = self.organizer.run(
-                user_message
+        if len(final_responses) == 1:
+            return final_responses[0].replace(
+                "Subtarea 1: ",
+                "",
+                1
             )
 
-            review = self.critic.run(
-                user_message,
-                response
-            )
+        return "\n\n".join(final_responses)
 
-            print(
-                f"[CRITIC] Veredicto: {review}"
-            )
+    def _execute_with_retry(
+        self,
+        decision: str,
+        task: str
+    ):
 
-            return response
-
-        # Expert
-        response = self.expert.run(
-            user_message
+        response = self._run_specialist(
+            decision,
+            task
         )
 
         review = self.critic.run(
-            user_message,
+            task,
             response
         )
 
@@ -86,13 +99,60 @@ class CoordinatorAgent:
             f"[CRITIC] Veredicto: {review}"
         )
 
-        if "invalid" in review.lower():
+        if "invalid" not in review.lower():
+            return response, review
 
-            print("[COORDINADOR] Respuesta rechazada por el CRITIC")
+        print(
+            "[COORDINADOR] Reintentando subtarea con "
+            "retroalimentacion del CRITIC"
+        )
 
-            return (
-                "Hubo un problema al procesar la solicitud. "
-                "Intenta reformularla."
-            )
+        retry_task = self._build_retry_task(
+            task,
+            review
+        )
 
-        return response
+        retry_response = self._run_specialist(
+            decision,
+            retry_task
+        )
+
+        retry_review = self.critic.run(
+            task,
+            retry_response
+        )
+
+        print(
+            f"[CRITIC] Veredicto reintento: {retry_review}"
+        )
+
+        return retry_response, retry_review
+
+    def _build_retry_task(
+        self,
+        task: str,
+        review: str
+    ) -> str:
+
+        return (
+            f"{task}\n\n"
+            "Retroalimentacion del critic:\n"
+            f"{review}\n\n"
+            "Corrige la respuesta anterior. "
+            "Debes cumplir exactamente la solicitud original "
+            "y evitar el error indicado por el critic."
+        )
+
+    def _run_specialist(
+        self,
+        decision: str,
+        user_message: str
+    ):
+
+        if "calculator" in decision:
+            return self.calculator.run(user_message)
+
+        if "organizer" in decision:
+            return self.organizer.run(user_message)
+
+        return self.expert.run(user_message)
